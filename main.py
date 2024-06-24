@@ -30,8 +30,9 @@ if __name__ == '__main__':
 
     type='gray'
     model_path="PT/svmGray.dat"
-    test_image_path="3.png"
+    test_image_path="yc_picture/1.png"
     svm = predict_select(model_path,test_image_path,type)
     print(f'Predicted class: {svm}')
+    # train_select(type)
 
 

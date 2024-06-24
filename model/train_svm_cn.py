@@ -59,7 +59,7 @@ class SVM_CNT:
         self.model.train(train_data)
 
     def train_svm_cn(self):
-        save_path = "PT/svmCh.dat"
+        save_path = "PT/svmCn.dat"
         if os.path.exists(save_path):
             self.model = cv2.ml.SVM_load(save_path)
         else:

@@ -60,8 +60,8 @@ class SVM:
         return predicted_class
 
 if __name__ == '__main__':
-    model_path = "model/svmCh.dat"
+    model_path = "PT/svmCn.dat"
     svm = SVM(model_path)
-    test_image_path = '0.png'
+    test_image_path = 'yc_picture/0.png'
     predicted_class = svm.predict(test_image_path)
     print(f'Predicted class: {predicted_class}')
