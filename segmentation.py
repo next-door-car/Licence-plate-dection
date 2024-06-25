@@ -15,10 +15,10 @@ def Threshold(binary_image):  #对域值进行处理
     # 计算垂直投影
     vertical_projection = np.sum(binary_image, axis=0)
     # 显示垂直投影直方图
-    # plt.figure()
-    # plt.plot(vertical_projection)
-    # plt.title('Vertical Projection')
-    # plt.show()
+    plt.figure()
+    plt.plot(vertical_projection)
+    plt.title('Vertical Projection')
+    plt.show()
 
     minima_indices = np.where((vertical_projection[:-2] > vertical_projection[1:-1]) &
                           (vertical_projection[2:] > vertical_projection[1:-1]))[0] + 1
@@ -38,7 +38,7 @@ def Threshold(binary_image):  #对域值进行处理
     return minima_indices,y_coordinates , threshold ,class_0_indices
 
 def slice(character_images, binary_array):
-    lens = range(len(character_images) - 1)
+    lens = range(len(character_images) - 2)
     classifier_CN = SVM_CN('PT/svmCn.dat')        
     classifier_Gray = SVM_GRAY('PT/svmGray.dat')  # Create an instance of the SVM_Gray class
     picture = []
@@ -51,15 +51,11 @@ def slice(character_images, binary_array):
         segmented_image_array = np.array(segmented_image)
         picture.append(segmented_image_array)
         
-        # Display or save the segmented image if needed
-        # show(segmented_image_array)
-        # cv2.imwrite(f'yc_picture/{image_lens}.png', segmented_image_array)
 
-        # Predict the class using classifier_CN and classifier_Gray
-        # predicted_class_CN = classifier_CN.predict(segmented_image_array)
-        # predicted_class_Gray = classifier_Gray.predict(segmented_image_array)
-        # print(f'Segment {image_lens} Predicted class by CN: {predicted_class_CN}, by Gray: {predicted_class_Gray}')
-    print(picture)
+        # show(segmented_image_array)
+        cv2.imwrite(f'yc_picture/{image_lens}.png', segmented_image_array)
+
+        
 
 def image_handle(binary_image):
     binary_array = binary_image
@@ -93,6 +89,8 @@ def segment_characters(binary_image):
     X_count = []
     for index in class_0_indices:
         X_count.append(index)
+    if len(X_count)>9:
+        X_count = X_count[:9]  # 截取前8个元素
     return X_count
       
 
@@ -101,8 +99,40 @@ def segment_characters(binary_image):
 if __name__ == '__main__':
     road = 'extracted_image.jpg'
     image = cv2.imread(road)
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    image1 = cv2.imread(road)
+    hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
+    # 定义HSV中蓝色的范围
+    lower_blue = np.array([100, 150, 46])
+    upper_blue = np.array([124, 255, 255])
+    # 创建掩码
+    mask = cv2.inRange(hsv_image, lower_blue, upper_blue)
+    # 将蓝色像素点替换为白色
+    image[mask > 0] = [255, 255, 255]
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    _, binary_image = cv2.threshold(gray_image, 128, 255, cv2.THRESH_BINARY_INV)
+    kerne2 = np.ones((15, 15), np.uint8)
+    closing = cv2.morphologyEx(binary_image, cv2.MORPH_CLOSE, kerne2) 
+    #旋转特性
+    
+    # show(closing)
+    edges = cv2.Canny(closing, 100, 200)
+    show(edges)
+    # 找到所有轮廓
+    contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+
+    # 将所有轮廓点合并到一个数组中
+    all_points = np.vstack([contour for contour in contours])
+    # 找到包含所有轮廓点的最小外接矩形
+    x, y, w, h = cv2.boundingRect(all_points)
+    # 直接使用边界矩形的坐标从原图像中截取对应的部分
+    images = image1[y:y+h, x:x+w]
+    show(images)
+
+
+    # gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray_image = cv2.cvtColor(images, cv2.COLOR_BGR2GRAY)
     resized_image = cv2.resize(gray_image, (160, 40))   #尺度变换
     resized_image = cv2.GaussianBlur(resized_image, (3, 3), 0) 
     normalized_image = (resized_image - np.min(resized_image)) * (100 / (np.max(resized_image) - np.min(resized_image)))
@@ -119,12 +149,12 @@ if __name__ == '__main__':
     image_with_lines = draw_vertical_lines(binary_array, character_images)
     
     
-    # # 显示结果图像
-    # plt.figure(figsize=(10, 5))
-    # plt.imshow(cv2.cvtColor(image_with_lines, cv2.COLOR_BGR2RGB))
-    # plt.title('Image with Red Vertical Lines')
-    # plt.axis('off')
-    # plt.show()
+    # 显示结果图像
+    plt.figure(figsize=(10, 5))
+    plt.imshow(cv2.cvtColor(image_with_lines, cv2.COLOR_BGR2RGB))
+    plt.title('Image with Red Vertical Lines')
+    plt.axis('off')
+    plt.show()
 
 
 

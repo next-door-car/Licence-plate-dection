@@ -11,7 +11,7 @@ def show(image):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    image_path = '1.png'
+    image_path = 'car_picture/8.jpg'
     image = cv2.imread(image_path)
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     lower_bound = np.array([100, 100, 46])
@@ -97,26 +97,44 @@ if __name__ == '__main__':
         # 绘制新的旋转矩形
         cv2.drawContours(line_image, [expanded_box], 0, (255, 0, 0), 2)
         show(line_image)
-        center = best_rect[0]
-        # size = (int(current_width), int(current_height))
-        size = (int(width1), int(height1))
-        weight_factor = 0.98  # 设定权重因子，范围可以根据需要调整
-        angle = best_rect[2]
+        
+        x_min = np.min(expanded_box[:, 0])
+        x_max = np.max(expanded_box[:, 0])
+        y_min = np.min(expanded_box[:, 1])
+        y_max = np.max(expanded_box[:, 1])
 
-        # 获取旋转矩阵
-        rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-        rows, cols = image.shape[:2]
-        rotated_image = cv2.warpAffine(image, rotation_matrix, (cols, rows), flags=cv2.INTER_CUBIC)
+        # 确保边界框在图像范围内
+        x_min = max(0, x_min)
+        x_max = min(line_image.shape[1], x_max)
+        y_min = max(0, y_min)
+        y_max = min(line_image.shape[0], y_max)
 
-        # 提取旋转后的图像
-        extracted_image = cv2.getRectSubPix(rotated_image, size, center)
-        if height1 > width1:
-            long = height1
-            short = width1
-            extracted_image = cv2.rotate(extracted_image, cv2.ROTATE_90_CLOCKWISE)
+        # 裁剪 line_image
+        image1 = image[y_min:y_max, x_min:x_max]
+        height1, width1 = image1.shape[:2]
+        # show(image1)
+
+
+        # center = best_rect[0]
+        # size = (int(width1), int(height1))
+        # angle = best_rect[2]
+
+        # # 获取旋转矩阵
+        # rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
+        # rows, cols = image.shape[:2]
+        # rotated_image = cv2.warpAffine(image1, rotation_matrix, (cols, rows), flags=cv2.INTER_CUBIC)
+
+
+        # # 提取旋转后的图像
+        # extracted_image = cv2.getRectSubPix(rotated_image, size, center)
+        # if height1 > width1:
+        #     long = height1
+        #     short = width1
+        #     image1 = cv2.rotate(image1, cv2.ROTATE_90_CLOCKWISE)
+
         long = width1
         short = height1
         print(f"长={long},宽={short}")
             #
-        show(extracted_image)
-        cv2.imwrite('extracted_image.jpg', extracted_image)
+        show(image1)
+        cv2.imwrite('extracted_image.jpg', image1)
