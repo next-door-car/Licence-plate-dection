@@ -11,7 +11,7 @@ def show(image):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    image_path = 'car_picture/8.jpg'
+    image_path = 'car_picture/9.jpg'
     image = cv2.imread(image_path)
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     lower_bound = np.array([100, 100, 46])
