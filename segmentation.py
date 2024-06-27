@@ -57,7 +57,7 @@ def two_value(img):
 
 if __name__ == '__main__':
     # road = 'extracted_image.jpg'
-    road ='picture\image1.png'
+    road ='extracted_image.jpg'
     image = cv2.imread(road)
     image1 = cv2.imread(road)
     # image=chuli(image)
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     show(image2)
     # pty = White_vertical(image2)
     pty = np.sum(image2 / 255, axis=0)  # 统计每一列的白色像素数量
-    non_zero_indices = np.where(pty > 0)[0]
+    non_zero_indices = np.where(pty > 4)[0]
     mean_values = []
 
     # 确保数组中的第一个数是第一个非零点的 x 坐标
@@ -101,7 +101,7 @@ if __name__ == '__main__':
         x1 = mean_values[i]
         x2 = mean_values[i + 1]
         cropped_image = image2[:, x1:x2]  # 在 x1 到 x2 之间裁剪图片
-        # cv.imwrite(f'yc_picture/{i}.png', cropped_image)  # 保存裁剪后的图片
+        cv.imwrite(f'yc_picture/{i}.png', cropped_image)  # 保存裁剪后的图片
         # show(cropped_image)
 
     #垂直直方图
