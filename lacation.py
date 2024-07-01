@@ -3,15 +3,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
-
-
-def show(image):
-    cv2.imshow('image', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
 if __name__ == '__main__':
-    image_path = '1.png'
+    image_path = 'car_picture/03.jpg'
     image = cv2.imread(image_path)
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     lower_bound = np.array([100, 100, 46])
@@ -37,10 +30,10 @@ if __name__ == '__main__':
 
     kerne3 = np.ones((20, 20), np.uint8)
     closing = cv2.dilate(closing, kerne3, iterations=1)  
-    show(closing)
+    # show(closing)
 
     edges = cv2.Canny(closing, 70, 200, apertureSize=5, L2gradient=False)
-    show(edges)
+    # show(edges)
     lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=50, maxLineGap=10)
     # 创建一个彩色图像用于绘制检测到的直线
     line_image = cv2.cvtColor(closing, cv2.COLOR_GRAY2BGR)
@@ -54,13 +47,42 @@ if __name__ == '__main__':
             angle = np.arctan2(y2 - y1, x2 - x1) * 180 / np.pi
             angles.append(angle)
 
-    show(line_image)
+    # show(line_image)
+
+    # 删除最大值与最小值
+    angles_array = np.array(angles)
+    angles_array = angles_array[angles_array != 0.0]  # 过滤掉值为 0.0 的元素
+    if len(angles_array) > 2: #长度大于2才删除
+        min_value = np.min(angles_array)
+        max_value = np.max(angles_array)
+        # 通过逻辑运算符 & 和 | 处理最小值和最大值删除
+        # 找到最小值和最大值的索引
+        min_indices = np.where(angles_array == min_value)[0]
+        max_indices = np.where(angles_array == max_value)[0]
+        # 如果最小值出现超过一次，只删除一个
+        if len(min_indices) > 1:
+            angles_array = np.delete(angles_array, min_indices[0])
+        else:
+            angles_array = angles_array[(angles_array != min_value)]
+        # 如果最大值出现超过一次，只删除一个
+        if len(max_indices) > 1:
+            angles_array = np.delete(angles_array, max_indices[0]) 
+        else:
+            angles_array = angles_array[(angles_array != max_value)]
+    
+    initial_average = np.mean(angles_array)
+    filtered_angles_array = angles_array[np.abs(angles_array - initial_average) <= 10]#与均值相差10就保留
+    
     if angles:
-        average_angle = np.mean(angles)
+        if len(filtered_angles_array) == 0:
+            average_angle = initial_average
+        else:
+            average_angle = np.mean(filtered_angles_array)
         print(f'Average Angle: {average_angle}')
     else:
         average_angle = 0
         print("No lines detected with average_angle.")
+
      # 找到轮廓
     contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -88,7 +110,6 @@ if __name__ == '__main__':
         height1 = current_height
         long = None
         short = None
-    
         # 创建新的旋转矩形
         expanded_rect = ((best_rect[0][0], best_rect[0][1]), (current_width, current_height), best_rect[2])
         expanded_box = cv2.boxPoints(expanded_rect)
@@ -96,7 +117,7 @@ if __name__ == '__main__':
 
         # 绘制新的旋转矩形
         cv2.drawContours(line_image, [expanded_box], 0, (255, 0, 0), 2)
-        show(line_image)
+        # show(line_image)
         
         x_min = np.min(expanded_box[:, 0])
         x_max = np.max(expanded_box[:, 0])
@@ -112,29 +133,9 @@ if __name__ == '__main__':
         # 裁剪 line_image
         image1 = image[y_min:y_max, x_min:x_max]
         height1, width1 = image1.shape[:2]
-        # show(image1)
-
-
-        # center = best_rect[0]
-        # size = (int(width1), int(height1))
-        # angle = best_rect[2]
-
-        # # 获取旋转矩阵
-        # rotation_matrix = cv2.getRotationMatrix2D(center, angle, 1.0)
-        # rows, cols = image.shape[:2]
-        # rotated_image = cv2.warpAffine(image1, rotation_matrix, (cols, rows), flags=cv2.INTER_CUBIC)
-
-
-        # # 提取旋转后的图像
-        # extracted_image = cv2.getRectSubPix(rotated_image, size, center)
-        # if height1 > width1:
-        #     long = height1
-        #     short = width1
-        #     image1 = cv2.rotate(image1, cv2.ROTATE_90_CLOCKWISE)
-
         long = width1
         short = height1
         print(f"长={long},宽={short}")
             #
-        show(image1)
+        # show(image1)
         cv2.imwrite('extracted_image.jpg', image1)

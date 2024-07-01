@@ -65,14 +65,26 @@ if __name__ == '__main__':
     images = scaling(image)   #再放缩图片
     gray_image = cv2.cvtColor (images, cv2.COLOR_BGR2GRAY)
     gray_image = two_value(gray_image) #二值化
-
     resized_image = cv2.resize(gray_image, (160, 40))   #尺度变换
     resized_image = 255 - resized_image  # 反转灰度图
 
     #使用水平投影分割
     image2 = level(resized_image)  #会出现上下两峰
-
+    # show(image2)
+    #1.需要简易的高斯滤波
+    image2 = cv2.GaussianBlur(image2, (3, 3), 0)
     show(image2)
+    #进行膨胀之后效果很差
+    # image = 255 - image2
+    # show(image)
+    #2.进行膨胀---->将汉字膨胀到一起
+    # kerne = np.ones((3, 3), np.uint8)
+    # image2 = cv2.dilate(image2, kerne, iterations=1)  
+    # show(image2)
+
+
+
+
     # pty = White_vertical(image2)
     pty = np.sum(image2 / 255, axis=0)  # 统计每一列的白色像素数量
     non_zero_indices = np.where(pty > 4)[0]
@@ -93,8 +105,11 @@ if __name__ == '__main__':
     for i in range(len(non_zero_indices) - 1):
         if non_zero_indices[i + 1] - non_zero_indices[i] >= 3:
             mean_value = int((non_zero_indices[i] + non_zero_indices[i + 1]) / 2)
-            mean_values.append(mean_value)
+            mean_values.append(mean_value)   #追加数组
 
+
+
+    #对第一张汉字图片需要进行裁剪处理
     # 输出存储的均值数组
     print("存储的均值数组：", mean_values)
     for i in range(len(mean_values) - 1):
@@ -103,6 +118,8 @@ if __name__ == '__main__':
         cropped_image = image2[:, x1:x2]  # 在 x1 到 x2 之间裁剪图片
         cv.imwrite(f'yc_picture/{i}.png', cropped_image)  # 保存裁剪后的图片
         # show(cropped_image)
+
+
 
     #垂直直方图
     plt.figure(figsize=(10, 5))
