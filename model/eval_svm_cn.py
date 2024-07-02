@@ -34,11 +34,13 @@ class SVM_CN:
 
         return predicted_class
 
+    #提取图像的HOG特征
     def preprocess_hog(self, image):
         features = hog(image, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2),
-                       block_norm='L2-Hys', transform_sqrt=True)
+                       block_norm='L2-Hys', transform_sqrt=True)  #cell为8x8像素,block为2x2个cell
         return features
 
+    #图像去倾斜---对矩值进行判断
     def deskew(self, image):
         moments = cv2.moments(image)
         if abs(moments['mu02']) < 1e-2:
@@ -48,6 +50,7 @@ class SVM_CN:
         deskewed = cv2.warpAffine(image, M, (image.shape[1], image.shape[0]), flags=cv2.WARP_INVERSE_MAP | cv2.INTER_LINEAR)
         return deskewed
 
+    #图像增强
     def augment_image(self, image):
         rows, cols = image.shape
         augmented_images = [image]

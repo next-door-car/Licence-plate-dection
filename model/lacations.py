@@ -139,5 +139,5 @@ class Lacation:
             # print(f"长={long},宽={short}")
                 #
             # show(image1)
-            # cv2.imwrite('extracted_image.jpg', image1)
+            cv2.imwrite('extracted_image.jpg', image1) 
             return image1

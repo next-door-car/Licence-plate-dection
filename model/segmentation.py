@@ -17,11 +17,10 @@ def show(image):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-if not os.path.exists('yc_picture'):
-    os.makedirs('yc_picture')
-
-
-
+if not os.path.exists('1'):
+    os.makedirs('1')
+if not os.path.exists('2'):
+    os.makedirs('2')
 
 
 class Segmentation:
@@ -223,7 +222,7 @@ class Segmentation:
             x1 = mean_values[i]
             x2 = mean_values[i + 1]
             images_all = image2[:, x1:x2]
-            cv2.imwrite(f'yc_picture/{i}.png', images_all)
+            #cv2.imwrite(f'1/{i}.png', images_all)
             cropped_images.append(images_all)  # 将裁剪后的图像添加到列表中
 
         # print("Stored mean values:", mean_values)

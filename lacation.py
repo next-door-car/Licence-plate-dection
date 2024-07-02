@@ -2,9 +2,10 @@ import cv2
 import numpy as np
 from matplotlib import pyplot as plt
 
+    
 
 if __name__ == '__main__':
-    image_path = 'car_picture/03.jpg'
+    image_path = 'example/1.jpg'
     image = cv2.imread(image_path)
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     lower_bound = np.array([100, 100, 46])
@@ -13,11 +14,8 @@ if __name__ == '__main__':
     output_image1 = np.ones_like(image) * 255
     output_image1[mask == 255] = [0, 0, 0]
 
-
-    
     gaussian_blur = cv2.GaussianBlur(output_image1, (5, 5), 0)
     median_blur = cv2.medianBlur(gaussian_blur, 5)
-    # show(median_blur)
     gray_image = cv2.cvtColor(median_blur, cv2.COLOR_BGR2GRAY)
     _, binary_image = cv2.threshold(gray_image, 128, 255, cv2.THRESH_BINARY_INV)
 
@@ -117,7 +115,6 @@ if __name__ == '__main__':
 
         # 绘制新的旋转矩形
         cv2.drawContours(line_image, [expanded_box], 0, (255, 0, 0), 2)
-        # show(line_image)
         
         x_min = np.min(expanded_box[:, 0])
         x_max = np.max(expanded_box[:, 0])
@@ -136,6 +133,5 @@ if __name__ == '__main__':
         long = width1
         short = height1
         print(f"长={long},宽={short}")
-            #
         # show(image1)
         cv2.imwrite('extracted_image.jpg', image1)

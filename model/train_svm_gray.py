@@ -61,28 +61,28 @@ class SVM_GRAYT:
         total_files = sum([len(files) for r, d, files in os.walk(root_folder)])
 
         with tqdm(total=total_files, desc="Processing images", ascii=True) as pbar:
-            for folder in folders:
-                    folder_path = os.path.join(root_folder, folder)
-                    root_int = ord(folder)
-                    for root, dirs, files in os.walk(folder_path):
-                        for filename in files:
-                            filepath = os.path.join(root, filename)
-                            digit_img = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
-                            digit_img = cv2.resize(digit_img, (16, 16))
-                            augmented_images = augment_image(digit_img)
-                            for img in augmented_images:
-                                chars_train.append(deskew(img))
-                                chars_label.append(root_int)
-                            pbar.update(1)
+                for folder in folders:
+                        folder_path = os.path.join(root_folder, folder)
+                        root_int = ord(folder)
+                        for root, dirs, files in os.walk(folder_path):
+                            for filename in files:
+                                filepath = os.path.join(root, filename)
+                                digit_img = cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
+                                digit_img = cv2.resize(digit_img, (16, 16))
+                                augmented_images = augment_image(digit_img)
+                                for img in augmented_images:
+                                    chars_train.append(deskew(img))
+                                    chars_label.append(root_int)
+                                pbar.update(1)
 
-            chars_train = preprocess_hog(chars_train)
-            chars_train = np.array(chars_train).astype(np.float32)
-            chars_label = np.array(chars_label).astype(np.int32)
-            chars_train = chars_train.reshape(-1, chars_train.shape[1])
+                chars_train = preprocess_hog(chars_train)
+                chars_train = np.array(chars_train).astype(np.float32)
+                chars_label = np.array(chars_label).astype(np.int32)
+                chars_train = chars_train.reshape(-1, chars_train.shape[1])
 
-            with tqdm(total=1, desc="Training SVM", ascii=True) as pbar:
-                self.train(chars_train, chars_label)
-                self.model.save(save_path)
-                pbar.update(1)        
+                with tqdm(total=1, desc="Training SVM", ascii=True) as pbar:
+                    self.train(chars_train, chars_label)
+                    self.model.save(save_path)
+                    pbar.update(1)        
 
 

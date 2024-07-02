@@ -16,7 +16,7 @@ def delete_images_in_subfolders(folder_path):
                 print(f"Error deleting {image}: {e}")
 
 # 指定主文件夹路径
-main_folder = 'train/annGray'
+main_folder = 'train/annCh'
 
 # 删除所有子文件夹中的图片
 delete_images_in_subfolders(main_folder)

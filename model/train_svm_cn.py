@@ -60,16 +60,13 @@ class SVM_CNT:
 
     def train_svm_cn(self):
         save_path = "PT/svmCn.dat"
-        if os.path.exists(save_path):
-            self.model = cv2.ml.SVM_load(save_path)
-        else:
-            chars_train = []
-            chars_label = []
-            root_folder = "train/annCh"
-            folders = sorted([folder for folder in os.listdir(root_folder) if os.path.isdir(os.path.join(root_folder, folder))])
-            total_files = sum([len(files) for r, d, files in os.walk(root_folder)])
+        chars_train = []
+        chars_label = []
+        root_folder = "train/annCh"
+        folders = sorted([folder for folder in os.listdir(root_folder) if os.path.isdir(os.path.join(root_folder, folder))])
+        total_files = sum([len(files) for r, d, files in os.walk(root_folder)])
 
-            with tqdm(total=total_files, desc="Processing images", ascii=True) as pbar:
+        with tqdm(total=total_files, desc="Processing images", ascii=True) as pbar:
                 for folder in folders:
                     folder_path = os.path.join(root_folder, folder)
                     #if folder in index:
@@ -86,14 +83,14 @@ class SVM_CNT:
                                 chars_label.append(self.count - 1)  #使用对应的index序列映射值到chars_label
                             pbar.update(1)
 
-            chars_train = preprocess_hog(chars_train)
-            chars_train = np.array(chars_train).astype(np.float32)
-            chars_label = np.array(chars_label).astype(np.int32)
-            chars_train = chars_train.reshape(-1, chars_train.shape[1])
+        chars_train = preprocess_hog(chars_train)
+        chars_train = np.array(chars_train).astype(np.float32)
+        chars_label = np.array(chars_label).astype(np.int32)
+        chars_train = chars_train.reshape(-1, chars_train.shape[1])
 
-            with tqdm(total=1, desc="Training SVM", ascii=True) as pbar:
+        with tqdm(total=1, desc="Training SVM", ascii=True) as pbar:
                 self.train(chars_train, chars_label)
-                self.model.save("PT/svmCn.dat")
+                self.model.save(save_path)
                 pbar.update(1)
 
  
