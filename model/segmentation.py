@@ -223,7 +223,7 @@ class Segmentation:
             x1 = mean_values[i]
             x2 = mean_values[i + 1]
             images_all = image2[:, x1:x2]
-            # cv2.imwrite(f'yc_picture/{i}.png', images_all)
+            cv2.imwrite(f'yc_picture/{i}.png', images_all)
             cropped_images.append(images_all)  # 将裁剪后的图像添加到列表中
 
         # print("Stored mean values:", mean_values)

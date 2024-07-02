@@ -142,7 +142,7 @@ def two_value(img):
 
 
 if __name__ == '__main__':
-    road ='extracted_image.jpg'
+    road ='text.png'
     image = cv2.imread(road)
     image1 = cv2.imread(road)
     # image=chuli(image)

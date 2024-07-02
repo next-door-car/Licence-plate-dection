@@ -93,7 +93,7 @@ class SVM_CNT:
 
             with tqdm(total=1, desc="Training SVM", ascii=True) as pbar:
                 self.train(chars_train, chars_label)
-                self.model.save(save_path)
+                self.model.save("PT/svmCn.dat")
                 pbar.update(1)
 
  

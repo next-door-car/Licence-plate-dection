@@ -53,18 +53,15 @@ class SVM_GRAYT:
 
     def train_svm_gray(self):
         save_path = "PT/svmGray.dat"
-        if os.path.exists(save_path):
-            self.model = cv2.ml.SVM_load(save_path)
-        else:
-            chars_train = []
-            chars_label = []
-            root_folder = "train/annGray"
-            folders = [folder for folder in os.listdir(root_folder) if os.path.isdir(os.path.join(root_folder, folder))]
+        chars_train = []
+        chars_label = []
+        root_folder = "train/annGray"
+        folders = [folder for folder in os.listdir(root_folder) if os.path.isdir(os.path.join(root_folder, folder))]
 
-            total_files = sum([len(files) for r, d, files in os.walk(root_folder)])
+        total_files = sum([len(files) for r, d, files in os.walk(root_folder)])
 
-            with tqdm(total=total_files, desc="Processing images", ascii=True) as pbar:
-                for folder in folders:
+        with tqdm(total=total_files, desc="Processing images", ascii=True) as pbar:
+            for folder in folders:
                     folder_path = os.path.join(root_folder, folder)
                     root_int = ord(folder)
                     for root, dirs, files in os.walk(folder_path):
@@ -86,6 +83,6 @@ class SVM_GRAYT:
             with tqdm(total=1, desc="Training SVM", ascii=True) as pbar:
                 self.train(chars_train, chars_label)
                 self.model.save(save_path)
-                pbar.update(1)
+                pbar.update(1)        
 
 
