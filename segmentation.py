@@ -142,12 +142,13 @@ def two_value(img):
 
 
 if __name__ == '__main__':
-    road ='text.png'
+    road ='extracted_image.jpg'
     image = cv2.imread(road)
     image1 = cv2.imread(road)
     # image=chuli(image)
     # cv2.imwrite('extracted_image.jpg', images)
     images = scaling(image)   #再放缩图片
+    
     
     gray_image = cv2.cvtColor (images, cv2.COLOR_BGR2GRAY)
     gray_image = two_value(gray_image) #二值化

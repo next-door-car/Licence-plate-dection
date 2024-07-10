@@ -28,12 +28,11 @@ def train_select(type):
 
 if __name__ == '__main__':
 
-    type='gray'
-    # model_path="PT/svmCn.dat"
-    # test_image_path="yc_picture/0.png"
-    # # image_array ='1'
-    # svm = predict_select(model_path = "PT/svmCn.dat",image_array =None,type = 'cn',test_image_path=test_image_path)
-    # print(f'Predicted class: {svm}')
-    train_select(type)
+    type='cn'
+    model_path="PT/svmCn.dat"
+    test_image_path="yc_picture/0.png"
+    svm = predict_select(model_path = "PT/svmCn.dat",image_array =None,type = 'cn',test_image_path=test_image_path)
+    print(f'Predicted class: {svm}')
+    # train_select(type)
 
 

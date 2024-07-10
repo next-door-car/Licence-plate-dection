@@ -12,15 +12,12 @@ from model.eval_svm_gray import SVM_GRAY
 from model.cut_level import*
 from model.cut_vertical import*
 from sklearn.cluster import KMeans
+
 def show(image):
     cv2.imshow('image', image)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-if not os.path.exists('1'):
-    os.makedirs('1')
-if not os.path.exists('2'):
-    os.makedirs('2')
 
 
 class Segmentation:
@@ -139,18 +136,19 @@ class Segmentation:
         image = self.image
         image1 = self.image
         images = self.scaling(image)
-
+        cv2.imwrite("show/segmentation/double_tailor.jpg", images) #二次裁剪
         gray_image = cv2.cvtColor(images, cv2.COLOR_BGR2GRAY)
         gray_image = self.two_value(gray_image)
-
         resized_image = cv2.resize(gray_image, (160, 40))
         resized_image = 255 - resized_image
+        cv2.imwrite("show/segmentation/resized_image.jpg", resized_image) #realize
 
         image2 = level(resized_image)
+        
         image2 = cv2.GaussianBlur(image2, (3, 3), 0)
 
         pty = np.sum(image2 / 255, axis=0)
-
+        
         average = sum(pty[:2]) / 2
         non_zero_indice = np.where(pty > 0)[0]
         non_zero_indices = np.where(pty > 2)[0]
@@ -222,15 +220,16 @@ class Segmentation:
             x1 = mean_values[i]
             x2 = mean_values[i + 1]
             images_all = image2[:, x1:x2]
-            #cv2.imwrite(f'1/{i}.png', images_all)
+            cv2.imwrite(f'show/char_segmentation/{i}.png', images_all)
             cropped_images.append(images_all)  # 将裁剪后的图像添加到列表中
 
         # print("Stored mean values:", mean_values)
 
-        # plt.figure(figsize=(10, 5))
-        # plt.bar(np.arange(len(pty)), pty, color='black')
-        # plt.title('Vertical Projection Histogram')
-        # plt.xlabel('Column Index')
-        # plt.ylabel('Number of White Pixels')
+        plt.figure(figsize=(10, 5))
+        plt.bar(np.arange(len(pty)), pty, color='black')
+        plt.title('Vertical Projection Histogram')
+        plt.xlabel('Column Index')
+        plt.ylabel('Number of White Pixels')
         # plt.show()
+        plt.savefig('show/segmentation/vertical.png', dpi=300, bbox_inches='tight')
         return cropped_images

@@ -3,6 +3,11 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 
+def show(image):
+    cv2.imshow('image', image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 class Lacation:
     def __init__(self,road):
         self.road = road
@@ -15,12 +20,15 @@ class Lacation:
         mask = cv2.inRange(hsv_image, lower_bound, upper_bound)
         output_image1 = np.ones_like(image) * 255
         output_image1[mask == 255] = [0, 0, 0]
- 
+        cv2.imwrite("show/1.jpg", output_image1)
+        # show(output_image1)
         gaussian_blur = cv2.GaussianBlur(output_image1, (5, 5), 0)
         median_blur = cv2.medianBlur(gaussian_blur, 5)
+        
         # show(median_blur)
         gray_image = cv2.cvtColor(median_blur, cv2.COLOR_BGR2GRAY)
         _, binary_image = cv2.threshold(gray_image, 128, 255, cv2.THRESH_BINARY_INV)
+        # show(binary_image)
 
         kernel = np.ones((5, 5), np.uint8)
         opening = cv2.morphologyEx(binary_image, cv2.MORPH_OPEN, kernel)  #开操作
@@ -31,8 +39,10 @@ class Lacation:
 
         kerne3 = np.ones((20, 20), np.uint8)
         closing = cv2.dilate(closing, kerne3, iterations=1)  
-        # show(closing)
 
+
+        # show(closing)
+        cv2.imwrite("show/location/closing.jpg", closing)
         edges = cv2.Canny(closing, 70, 200, apertureSize=5, L2gradient=False)
         # show(edges)
         lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=50, maxLineGap=10)
@@ -49,7 +59,7 @@ class Lacation:
                 angles.append(angle)
 
         # show(line_image)
-
+        cv2.imwrite("show/location/line_image.jpg", line_image)
         # 删除最大值与最小值
         angles_array = np.array(angles)
         angles_array = angles_array[angles_array != 0.0]  # 过滤掉值为 0.0 的元素
@@ -71,8 +81,14 @@ class Lacation:
             else:
                 angles_array = angles_array[(angles_array != max_value)]
         
-        initial_average = np.mean(angles_array)
-        filtered_angles_array = angles_array[np.abs(angles_array - initial_average) <= 10]#与均值相差10就保留
+        if len(angles_array) == 0:
+            initial_average = 0
+            filtered_angles_array = angles_array
+        else:
+            initial_average = np.mean(angles_array)
+            filtered_angles_array = angles_array[np.abs(angles_array - initial_average) <= 10]
+        # initial_average = np.mean(angles_array)
+        # filtered_angles_array = angles_array[np.abs(angles_array - initial_average) <= 10]#与均值相差10就保留
         
         if angles:
             if len(filtered_angles_array) == 0:
@@ -86,6 +102,7 @@ class Lacation:
 
         # 找到轮廓
         contours, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        # show(contours)
 
         # 找到最大的旋转外接矩形
         max_area = 0
@@ -136,8 +153,5 @@ class Lacation:
             height1, width1 = image1.shape[:2]
             long = width1
             short = height1
-            # print(f"长={long},宽={short}")
-                #
             # show(image1)
-            cv2.imwrite('extracted_image.jpg', image1) 
             return image1

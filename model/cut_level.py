@@ -48,6 +48,7 @@ def level(image):
     row = [i for i in range(rows)]
     # 横向直方图
     plt.barh(row, ptx, color='black', height=1)
+    plt.savefig('show/segmentation/level.png', dpi=300, bbox_inches='tight')
     # plt.show()
     h1, h2 = Cut_level(ptx, rows)
     cut_level = image[h1:h2, :]

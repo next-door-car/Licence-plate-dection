@@ -17,7 +17,7 @@ def preprocess_hog(images):
                        block_norm='L2-Hys', transform_sqrt=True)
         processed_images.append(features)
     return processed_images
-
+#矫正偏差，计算矩
 def deskew(image):
     moments = cv2.moments(image)
     if abs(moments['mu02']) < 1e-2:

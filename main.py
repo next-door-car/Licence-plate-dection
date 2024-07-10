@@ -7,8 +7,7 @@ from model.train_svm_cn import SVM_CNT
 from model.train_svm_gray import SVM_GRAYT
 from model.lacations import Lacation
 from model.segmentation import Segmentation
-
-
+import time
 def predict_select(model_path,image_array,type, test_image_path):
     if type == 'cn':
         classifier = SVM_CN(model_path)  # 创建 SVM_CN 类的实例
@@ -30,11 +29,12 @@ def train_select(type):
         svm_gray.train_svm_gray()
 
 if __name__ == '__main__':
+    start_time = time.time()  # 开始计时
     #预处理
-    input_road = 'example/2.jpg'
+    input_road = 'example/3.jpg'
     location = Lacation(input_road)
     image = location.picture_lacation()
-    # cv2.imwrite('text.png',image)
+    cv2.imwrite('show/location/success.png',image)
     gass = Segmentation(image)
     image = gass.process_image()
     inffer = []
@@ -48,7 +48,9 @@ if __name__ == '__main__':
     data_array.append(svm_cn)
     for i in range(1 , len(image)):
         svm_gray = predict_select(model_path = 'PT/svmGray.dat',image_array = image[i],type = 'gray',test_image_path=None)
-        data_array.append(svm_gray)    
+        data_array.append(svm_gray)   
+    end_time = time.time()  # 结束计时
+    elapsed_time = end_time - start_time  # 计算运行时间     
     print(f'Predicted class: {data_array}')
-
+    print(f'Time taken: {elapsed_time:.2f} seconds')
 
